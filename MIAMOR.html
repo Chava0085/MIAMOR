@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<!-- El head y los estilos se mantienen igual -->
+<head>
+    <!-- Todo el contenido del head se mantiene exactamente igual que en la versión anterior -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para mi amor ❤️</title>
+    <style>
+        /* Todos los estilos se mantienen exactamente igual que en la versión anterior */
+        body {
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffe6e6, #ffb3b3);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 500px;
+            height: 80vh;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .messages-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            margin: 10px;
+            padding: 15px;
+            border-radius: 20px;
+            max-width: 80%;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s forwards;
+            word-wrap: break-word;
+        }
+
+        .sender {
+            background: #FFB6C1;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .receiver {
+            background: #E6E6FA;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .input-container {
+            display: none;
+            padding: 15px;
+            background: #fff;
+            border-top: 1px solid #eee;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: #f8f8f8;
+            border-radius: 20px;
+            padding: 5px 15px;
+            border: 2px solid #FFB6C1;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .buttons-container {
+            display: none;
+            justify-content: space-around;
+            padding: 15px;
+            background: #fff;
+            border-top: 1px solid #eee;
+        }
+
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            background: #FF69B4;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+        }
+
+        .final-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            background: white;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .final-screen img {
+            max-width: 300px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .final-message {
+            font-size: 24px;
+            color: #FF1493;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container" id="chat">
+        <div class="messages-area" id="messagesArea">
+            <!-- Los mensajes se agregarán aquí dinámicamente -->
+        </div>
+
+        <div class="input-container" id="inputContainer">
+            <div class="input-wrapper">
+                <input type="text" id="userInput" placeholder="Escribe tu respuesta aquí...">
+            </div>
+        </div>
+
+        <div class="buttons-container" id="buttonsContainer">
+            <button onclick="handleAnswer('yes')">¡Sí quiero! 💖</button>
+            <button onclick="handleAnswer('yes')">¡Por supuesto que sí! 🥰</button>
+        </div>
+    </div>
+
+    <div class="final-screen" id="finalScreen">
+        <img src="miniñahermosa.jpg" alt="Mi niña hermosa">
+        <div class="final-message">¡TE AMOOOO! 💕</div>
+    </div>
+
+    <script>
+        // Todo el JavaScript se mantiene exactamente igual que en la versión anterior
+        const messages = [
+            { text: "Hola mi amor ❤️", delay: 2000 },
+            { text: "Tengo algo muuuy especial que preguntarte...", delay: 2000 },
+            { text: "Pero primero...", delay: 2500 },
+            { text: "Quiero que me cuentes ¿Como te haz sentido con la relación?", delay: 1500, input: true },
+            { text: "Ahora, dime algo que te haga sentir especial y querida 💕", delay: 1500, input: true },
+            { text: "Me encanta saber que es lo que te hace sentir amada y justo ahorita quiero que te sientas asi.", delay: 4500 },
+            { text: "Sabes pensé en ti cuando hice esto...", delay: 4500 },
+            { text: "Porque cada día me haces sonreír y me siento muy amado por ti y quiero mostrarte que no doy por hecho nada😊", 		     delay: 5000 },
+            { text: "Así que, mi amor...", delay: 5500 },
+	    { text: "Mi niña hermosa y preciosa...", delay: 6500 },
+	    { text: "Chula y bella...", delay: 7500 },
+            { text: "💌 ¿Quieres ser mi San Valentín? 💌", delay: 2500, buttons: true }
+        ];
+
+        let currentMessage = 0;
+        let userResponses = [];
+
+        function addMessage(text, isReceiver = true) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isReceiver ? 'receiver' : 'sender'}`;
+            messageDiv.textContent = text;
+            document.getElementById('messagesArea').appendChild(messageDiv);
+            messageDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showInput() {
+            document.getElementById('inputContainer').style.display = 'block';
+            document.getElementById('userInput').focus();
+        }
+
+        function showButtons() {
+            document.getElementById('buttonsContainer').style.display = 'flex';
+        }
+
+        function handleUserInput(event) {
+            if (event.key === 'Enter' && event.target.value.trim()) {
+                const response = event.target.value.trim();
+                userResponses.push(response);
+                addMessage(response, false);
+                document.getElementById('inputContainer').style.display = 'none';
+                event.target.value = '';
+                currentMessage++;
+                showNextMessage();
+            }
+        }
+
+        function handleAnswer() {
+            document.getElementById('chat').style.display = 'none';
+            document.getElementById('finalScreen').style.display = 'flex';
+        }
+
+        function showNextMessage() {
+            if (currentMessage < messages.length) {
+                const message = messages[currentMessage];
+                setTimeout(() => {
+                    addMessage(message.text);
+                    if (message.input) {
+                        showInput();
+                    } else if (message.buttons) {
+                        showButtons();
+                    } else {
+                        currentMessage++;
+                        showNextMessage();
+                    }
+                }, message.delay);
+            }
+        }
+
+        document.getElementById('userInput').addEventListener('keypress', handleUserInput);
+        showNextMessage();
+    </script>
+</body>
+</html>
